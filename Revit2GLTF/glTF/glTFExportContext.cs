@@ -348,7 +348,7 @@ namespace Revit2Gltf.glTF
             if (MapSymbolId.ContainsKey(symElem.UniqueId))
             {
                 var gltfNode = new glTFNode();
-                gltfNode.name = _element.Name;
+                gltfNode.name = _element.Id.ToString();
                 glTF.nodes.Add(gltfNode);
                 _elementInstanceNodelist.Add(glTF.nodes.Count - 1);
                 gltfNode.matrix = new List<double> {
@@ -373,7 +373,7 @@ namespace Revit2Gltf.glTF
             {
                 var e = doc.GetElement(elementId);
                 var node = new glTFNode();
-                node.name = e.Name;
+                node.name = elementId.ToString();
 
 
                 var meshID = glTF.meshes.Count;
@@ -472,7 +472,7 @@ namespace Revit2Gltf.glTF
             {
                 var e = doc.GetElement(elementId);
                 var node = new glTFNode();
-                node.name = e.Name;
+                node.name = elementId.ToString();
                 glTF.nodes[0].children.Add(glTF.nodes.Count);
                 glTF.nodes.Add(node);
                 node.children = new List<int>();

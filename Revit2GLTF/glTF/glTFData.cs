@@ -52,7 +52,7 @@ namespace Revit2Gltf.glTF
 
     public class glTFVersion
     {
-        public string generator = "exportGLTF by:https://github.com/cowboy1997/Revit2GLTF";
+        // public string generator = "exportGLTF by:https://github.com/cowboy1997/Revit2GLTF";
         public string version = "2.0";
         public Dictionary<string, object> extras { get; set; }
         public Dictionary<string, object> extensions { get; set; }
