@@ -419,5 +419,39 @@ namespace Revit2Gltf.glTF
             return null;
         }
 
+        
+        // 矩阵乘法函数,设置y轴向上
+        public static List<double> MultiplyMatrices(List<double> originalMatrix)
+        {
+            // 转换矩阵
+            var yUpMatrix = new List<double> {
+                1, 0,  0, 0,
+                0, 0,  -1, 0,
+                0, 1, 0, 0,
+                0, 0,  0, 1,
+            };
+            
+            if (originalMatrix == null || originalMatrix.Count == 0)
+            {
+                return yUpMatrix;
+            }
+            else
+            {
+                List<double> result = new List<double>(16);
+                for (int row = 0; row < 4; row++)
+                {
+                    for (int col = 0; col < 4; col++)
+                    {
+                        double sum = 0;
+                        for (int k = 0; k < 4; k++)
+                        {
+                            sum += originalMatrix[row * 4 + k] * yUpMatrix[k * 4 + col];
+                        }
+                        result.Add(sum);
+                    }
+                }
+                return result;
+            }
+        }
     }
 }

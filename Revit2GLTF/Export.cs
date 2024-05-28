@@ -32,10 +32,9 @@ namespace Revit2Gltf
                 stopWatch.Start();
                 var setting = new glTFSetting
                 {
-                    useDraco = (bool)mainWindow.useDraco.IsChecked,
+                    useDraco = false, //(bool)mainWindow.useDraco.IsChecked,
                     fileName = mainWindow.fileName.Text,
-                    exportProperty = false
-                    // exportProperty = (bool)mainWindow.exportProperty.IsChecked
+                    exportProperty = false //(bool)mainWindow.exportProperty.IsChecked
                 };
                 var context = new glTFExportContext(doc, setting);
                 var exporter = new CustomExporter(doc, context)

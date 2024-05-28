@@ -67,8 +67,8 @@ namespace Revit2Gltf.glTF
             glTF = new GLTF();
             if (setting.useDraco)
             {
-                // glTF.extensionsRequired = new List<string>() { "KHR_draco_mesh_compression" };
-                // glTF.extensionsUsed = new List<string>() { "KHR_draco_mesh_compression" };
+                glTF.extensionsRequired = new List<string>() { "KHR_draco_mesh_compression" };
+                glTF.extensionsUsed = new List<string>() { "KHR_draco_mesh_compression" };
                 dracoBufferViews = new List<glTFBufferView>();
                 taskList = new List<Task>();
             }
@@ -81,20 +81,20 @@ namespace Revit2Gltf.glTF
             glTF.buffers = new List<glTFBuffer>();
             glTF.materials = new List<glTFMaterial>();
             var scence = new glTFScene();
-            scence.nodes = new List<int>() { 0 };
+            scence.nodes = new List<int>() {};
             glTF.scenes.Add(scence);
-            glTFNode root = new glTFNode();
-            root.name = "root";
-            root.children = new List<int>();
-            //设置y轴向上
-            root.matrix = new List<double>()
-            {
-                0.3048, 0.0,0.0, 0.0,
-                0.0,0.0, -0.3048, 0.0,
-                0.0,0.3048,0.0,0.0,
-                0.0,0.0,0.0, 1.0
-            };
-            glTF.nodes.Add(root);
+            // glTFNode root = new glTFNode();
+            // root.name = "root";
+            // root.children = new List<int>();
+            // //设置y轴向上
+            // root.matrix = new List<double>()
+            // {
+            //     0.3048, 0.0,0.0, 0.0,
+            //     0.0,0.0, -0.3048, 0.0,
+            //     0.0,0.3048,0.0,0.0,
+            //     0.0,0.0,0.0, 1.0
+            // };
+            // glTF.nodes.Add(root);
             allBinaryDatas = new List<glTFBinaryData>();
         }
 
@@ -228,6 +228,7 @@ namespace Revit2Gltf.glTF
                          glTF.bufferViews[glTF.bufferViews.Count() - 1].byteLength;
             glTF.buffers = new List<glTFBuffer>() { newbuffer };
 
+            /*
             glTF.cameras = new List<glTFCameras>();
 
 
@@ -255,9 +256,13 @@ namespace Revit2Gltf.glTF
             cameraNode.name = "revit_camera";
             glTF.cameras.Add(camera);
             glTF.nodes[0].children.Add(glTF.nodes.Count - 1);
+             */
 
-
-
+            //矩阵乘法，设置每个构件y轴向上
+            for (int i = 0; i < glTF.nodes.Count; i++)
+            {
+                glTF.nodes[i].matrix = glTFUtil.MultiplyMatrices(glTF.nodes[i].matrix);
+            }
 
             var fileExtension = Path.GetExtension(setting.fileName).ToLower();
             if (fileExtension == ".gltf")
@@ -385,6 +390,7 @@ namespace Revit2Gltf.glTF
                 var gltfNode = new glTFNode();
                 gltfNode.name = _element.Id.ToString();
                 glTF.nodes.Add(gltfNode);
+                glTF.scenes[0].nodes.Add(glTF.nodes.Count - 1);
                 _elementInstanceNodelist.Add(glTF.nodes.Count - 1);
                 gltfNode.matrix = new List<double> {
                         CurrentTransform.BasisX.X, CurrentTransform.BasisX.Y, CurrentTransform.BasisX.Z, 0,
@@ -429,20 +435,21 @@ namespace Revit2Gltf.glTF
                         t.Origin.X, t.Origin.Y, t.Origin.Z, 1};
                 }
                 glTF.nodes.Add(node);
+                glTF.scenes[0].nodes.Add(glTF.nodes.Count - 1);
                 if (isInstance)
                 {
                     _elementInstanceNodelist.Add(glTF.nodes.Count - 1);
                 }
                 else
                 {
-                    node.extras = new Dictionary<string, object>();
-                    node.extras.Add("ElementID", e.Id.IntegerValue);
-                    node.extras.Add("UniqueId", e.UniqueId);
-                    if(setting.exportProperty)
-                    {
-                        node.extras.Add("Parameters", glTFUtil.GetParameter(e));
-                    }
-                    glTF.nodes[0].children.Add(glTF.nodes.Count - 1);
+                    // node.extras = new Dictionary<string, object>();
+                    // node.extras.Add("ElementID", e.Id.IntegerValue);
+                    // node.extras.Add("UniqueId", e.UniqueId);
+                    // if(setting.exportProperty)
+                    // {
+                    //     node.extras.Add("Parameters", glTFUtil.GetParameter(e));
+                    // }
+                    // glTF.nodes[0].children.Add(glTF.nodes.Count - 1);
                 }
                 var mesh = new glTFMesh();
                 glTF.meshes.Add(mesh);
@@ -508,17 +515,18 @@ namespace Revit2Gltf.glTF
                 var e = doc.GetElement(elementId);
                 var node = new glTFNode();
                 node.name = elementId.ToString();
-                glTF.nodes[0].children.Add(glTF.nodes.Count);
+                // glTF.nodes[0].children.Add(glTF.nodes.Count);
                 glTF.nodes.Add(node);
-                node.children = new List<int>();
-                node.children.AddRange(_elementInstanceNodelist);
-                node.extras = new Dictionary<string, object>();
-                node.extras.Add("ElementID", e.Id.IntegerValue);
-                node.extras.Add("UniqueId", e.UniqueId);
-                if (setting.exportProperty)
-                {
-                    node.extras.Add("Parameters", glTFUtil.GetParameter(e));
-                }
+                glTF.scenes[0].nodes.Add(glTF.nodes.Count - 1);
+                // node.children = new List<int>();
+                // node.children.AddRange(_elementInstanceNodelist);
+                // node.extras = new Dictionary<string, object>();
+                // node.extras.Add("ElementID", e.Id.IntegerValue);
+                // node.extras.Add("UniqueId", e.UniqueId);
+                // if (setting.exportProperty)
+                // {
+                //     node.extras.Add("Parameters", glTFUtil.GetParameter(e));
+                // }
             }
         }
 
