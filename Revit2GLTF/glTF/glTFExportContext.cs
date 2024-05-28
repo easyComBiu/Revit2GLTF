@@ -40,6 +40,25 @@ namespace Revit2Gltf.glTF
         private List<glTFBufferView> dracoBufferViews;
         //draco多线程
         private List<Task> taskList;
+
+        //是否为主revit
+        public bool bIsMainRvtExport = false;
+        public bool bIsExportCombinedFamily = false;
+        
+        public List<string> combinedFamilyElementList = new List<string>();
+
+        bool IsCombinedFamily(string sFamilyName)
+        {
+            foreach(string strKey in new List<string> {"CBT","GIS","SCT"})
+            {
+                if(sFamilyName.Contains(strKey))
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
         public glTFExportContext(Document document, glTFSetting exportSetting)
         {
             _documentStack.Push(document);
@@ -48,8 +67,8 @@ namespace Revit2Gltf.glTF
             glTF = new GLTF();
             if (setting.useDraco)
             {
-                glTF.extensionsRequired = new List<string>() { "KHR_draco_mesh_compression" };
-                glTF.extensionsUsed = new List<string>() { "KHR_draco_mesh_compression" };
+                // glTF.extensionsRequired = new List<string>() { "KHR_draco_mesh_compression" };
+                // glTF.extensionsUsed = new List<string>() { "KHR_draco_mesh_compression" };
                 dracoBufferViews = new List<glTFBufferView>();
                 taskList = new List<Task>();
             }
@@ -310,6 +329,22 @@ namespace Revit2Gltf.glTF
             _curSymbolId = null;
             _element = doc.GetElement(elementId);
             curMapBinaryData = new Dictionary<string, glTFBinaryData>();
+
+            if (bIsMainRvtExport && bIsExportCombinedFamily)
+            {
+                FamilyInstance familyInstance = _element as FamilyInstance;
+                if (familyInstance != null)
+                {
+                    var familySymbol = familyInstance.Symbol;
+                    if (familySymbol != null)
+                    {
+                        if (IsCombinedFamily(familySymbol.FamilyName))
+                        {
+                            combinedFamilyElementList.Add(familySymbol.UniqueId);
+                        }
+                    }   
+                }
+            }
             return RenderNodeAction.Proceed;
         }
 
