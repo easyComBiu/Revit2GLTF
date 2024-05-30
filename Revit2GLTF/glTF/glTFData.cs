@@ -279,11 +279,11 @@ namespace Revit2Gltf.glTF
 
     public class glTFSampler
     {
-        public double magFilter { get; set; }
+        public int magFilter { get; set; }
 
-        public double minFilter { get; set; }
-        public double wrapS { get; set; }
-        public double wrapT { get; set; }
+        public int minFilter { get; set; }
+        public int wrapS { get; set; }
+        public int wrapT { get; set; }
     }
 
 
